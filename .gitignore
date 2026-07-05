@@ -1,0 +1,19 @@
+# Local RAG Databases and Vector Shards
+db/
+local_chroma_db/
+.chroma/
+
+# Raw User Data & Source Files
+source_docs/
+
+# Python Cache & Environment
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Streamlit logs/runtime configuration
+.streamlit/
+
+# editor
+.vscode
