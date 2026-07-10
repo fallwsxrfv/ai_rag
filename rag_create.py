@@ -132,8 +132,6 @@ def auto_discover_and_index(root_source_dir: str):
                 try:
                     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                         zip_ref.extractall(extraction_target)
-
-                    # Delete the zip file after successful extraction to prevent recursive loops
                     os.remove(zip_path)
                 except Exception as e:
                     print(f"    [!] Failed to extract zip file: {e}")
@@ -141,13 +139,26 @@ def auto_discover_and_index(root_source_dir: str):
     # --- PHASE 2: PROCEED WITH OMNICHANNEL INGESTION ---
     print(f"\nStarting Omnichannel Ingestion across: {root_source_dir}\n" + "="*60)
 
-    # Scan the top-level items in source_docs to build our subject shards
-    for item in os.listdir(root_source_dir):
-        item_path = os.path.join(root_source_dir, item)
-        if os.path.isdir(item_path):
-            index_single_subject(subject_name=item, source_folder=item_path)
+    # Establish the explicit path to your multi-folder container
+    all_docs_path = os.path.join(root_source_dir, "all_docs")
+    
+    if os.path.exists(all_docs_path) and os.path.isdir(all_docs_path):
+        # 1. Step into 'all_docs' and dynamically index every sport/topic subfolder
+        for sub_item in os.listdir(all_docs_path):
+            sub_item_path = os.path.join(all_docs_path, sub_item)
+            if os.path.isdir(sub_item_path):
+                # This automatically creates 'swimming', 'table_tennis', etc.
+                index_single_subject(subject_name=sub_item.lower(), source_folder=sub_item_path)
+
+        # 2. Index 'all_docs' itself as its own global catch-all collection
+        index_single_subject(subject_name="all_docs", source_folder=all_docs_path)
+    else:
+        # Fallback to standard top-level behavior if directory layout shifts back
+        for item in os.listdir(root_source_dir):
+            item_path = os.path.join(root_source_dir, item)
+            if os.path.isdir(item_path):
+                index_single_subject(subject_name=item.lower(), source_folder=item_path)
 
     print("="*60 + "\nOmnichannel ingestion complete.")
-
 if __name__ == "__main__":
     auto_discover_and_index("./source_docs")

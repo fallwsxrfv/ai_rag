@@ -2,7 +2,7 @@ import os
 
 # Centralized System Settings
 APP_CONFIG = {
-    "default_model": "qwen2.5-coder:32b-rag",
+    "default_model": "qwen2.5:1.5b",
     "embedding_model": "nomic-embed-text",
     "base_url": "http://localhost:11434",
     "db_root_dir": "./db"
